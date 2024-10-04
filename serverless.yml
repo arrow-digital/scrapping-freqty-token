@@ -1,0 +1,42 @@
+frameworkVersion: "4.4.4"
+service: scrapping-token
+app: scrapping-freqkty-token
+
+plugins:
+  - serverless-offline
+  # - serverless-plugin-chrome
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: sa-east-1
+  stage: serverless
+  profile: scrapping_lambda
+  deploymentBucket:
+    name: freqkty-token-application-serverless
+
+functions:
+  health-check:
+    handler: src/handlers/health-check-handler.handlerFunc
+    events:
+      - httpApi:
+          path: /
+          method: get
+
+  scrapping:
+    handler: src/handlers/scrapping-token-handler.handlerFunc
+    events:
+      - httpApi:
+          path: /scrapping
+          method: get
+    timeout: 300 # Definindo timeout para 5 minutos
+
+package:
+  include:
+    - "*"
+  exclude:
+    - .git/**
+    - .serverless
+    - .gitignore
+  individually: true
+  excludeDevDependencies: true
