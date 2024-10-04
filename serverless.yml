@@ -4,7 +4,6 @@ app: scrapping-freqkty-token
 
 plugins:
   - serverless-offline
-  # - serverless-plugin-chrome
 
 provider:
   name: aws
@@ -29,7 +28,10 @@ functions:
       - httpApi:
           path: /scrapping
           method: get
-    timeout: 300 # Definindo timeout para 5 minutos
+      - schedule:
+          rate: rate(12 hours)
+          enabled: true
+    timeout: 300 # 5 minutes for timeout
 
 package:
   include:

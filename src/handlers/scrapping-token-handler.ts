@@ -1,7 +1,7 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { getBearerToken } from "../utils/scrapping-token";
+import { APIGatewayProxyResult } from 'aws-lambda';
+import { getBearerToken } from '../utils/scrapping-token';
 
-export async function handlerFunc(_event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> {
+export async function handlerFunc(): Promise<APIGatewayProxyResult> {
   const token = await getBearerToken();
 
   const body = JSON.stringify({ token });
