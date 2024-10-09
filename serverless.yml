@@ -4,6 +4,7 @@ app: scrapping-freqkty-token
 
 plugins:
   - serverless-offline
+  # - serverless-plugin-chrome
 
 provider:
   name: aws
@@ -11,8 +12,7 @@ provider:
   region: sa-east-1
   stage: serverless
   profile: scrapping_lambda
-  deploymentBucket:
-    name: freqkty-token-application-serverless
+  memorySize: 2048
 
 functions:
   health-check:
@@ -36,6 +36,7 @@ functions:
 package:
   include:
     - "*"
+    - node_modules/puppeteer/.local-chromium/**
   exclude:
     - .git/**
     - .serverless
