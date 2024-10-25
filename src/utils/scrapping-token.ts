@@ -44,7 +44,5 @@ export async function scrappingPandaToken({ email, password }: Credentials) {
   const token = await page.evaluate(() => sessionStorage.getItem("token"));
   await browser.close();
 
-  console.log(token);
-
   return token;
 }

@@ -17,16 +17,15 @@ async function main() {
     }
 
     // Every 1 minutes runs cron job
-    cron.schedule("*/1 * * * *", () =>
-      updatePandaToken({ email: EMAIL_AUTH_PANDA, password: PASSWORD_AUTH_PANDA }),
-    );
-
-    // Every 12 AM and 12 PM runs cron job
-    // cron.schedule("0 0 0,12 * * *", () =>
+    // cron.schedule("*/1 * * * *", () =>
     //   updatePandaToken({ email: EMAIL_AUTH_PANDA, password: PASSWORD_AUTH_PANDA }),
     // );
+
+    // Every 12 AM and 12 PM runs cron job
+    cron.schedule("0 0 0,12 * * *", () =>
+      updatePandaToken({ email: EMAIL_AUTH_PANDA, password: PASSWORD_AUTH_PANDA }),
+    );
   } catch (error) {
-    console.log(error);
     console.log(`[${new Date().toLocaleString()}] Error: ${JSON.stringify(error)}\n`);
   }
 }
