@@ -5,7 +5,9 @@
   "scripts": {
     "build": "tsup",
     "start": "node dist/.",
-    "dev": "tsx watch src/."
+    "once": "node dist/. --run-now --no-cron",
+    "dev": "tsx watch src/.",
+    "dev:once": "tsx watch src/. --run-now --no-cron"
   },
   "keywords": [],
   "author": "",

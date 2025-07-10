@@ -6,7 +6,7 @@ export enum ENUMDatabaseType {
 export type DatabaseType = keyof typeof ENUMDatabaseType;
 
 export enum ENUMUpdateForName {
-  'LinkIO',
+  'Linkio',
   'KIS',
 }
 

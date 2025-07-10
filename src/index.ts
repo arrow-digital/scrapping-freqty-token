@@ -1,11 +1,13 @@
 import "dotenv/config";
 
+import cron from "node-cron";
 import { connectMongo } from "./utils/mongo";
 import { updatePandaToken } from "./functions/update-panda-token";
 import logger from "./utils/logger";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { Credentials } from "./@types";
+import mongoose from "mongoose";
 
 const obtainCredentials = (fileName: string = 'credentials.json'): Credentials[] => {
   let jsonFilePath = join(process.cwd(), fileName);
@@ -17,31 +19,65 @@ const obtainCredentials = (fileName: string = 'credentials.json'): Credentials[]
 }
 
 async function main() {
-  try {
-    await connectMongo();
+  await connectMongo();
 
-    logger.info('mongo connected');
-    logger.info('service is running');
+  logger.info('mongo connected');
+  logger.info('service is running');
 
-    // load up credentials from json file
-    const credentials = obtainCredentials();
-    logger.info('credentials loaded from file: ' + credentials.length);
+  // setup graceful shutdown handlers
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('beforeExit', () => gracefulShutdown('beforeExit'));
 
-    // Every 1 minutes runs cron job
-    // cron.schedule("*/1 * * * *", () =>
-    //   updatePandaToken({ email: EMAIL_AUTH_PANDA, password: PASSWORD_AUTH_PANDA }),
-    // );
+  // load up credentials from json file
+  const credentials = obtainCredentials();
+  logger.info('credentials loaded from file: ' + credentials.length);
 
-    // Every 12 AM and 12 PM runs cron job
-    // cron.schedule("0 0 0,12 * * *", () =>
-      for (const credential of credentials) {
+  if (process.argv.includes('--run-now')) {
+    // run once sequentially to update all tokens
+    logger.info('running update tokens now');
+    for (const credential of credentials) {
+      try {
         logger.info(`updating token for ${credential.name}`);
         await updatePandaToken(credential);
+      } catch (error) {
+        logger.error(String(error));
       }
-    // );
-  } catch (error) {
-    logger.error(`${JSON.stringify(error)}`);
+    }
   }
+
+  if (!process.argv.includes('--no-cron')) {
+    // set cron job to update tokens every 12 hours
+    logger.info('setting up cron job to update tokens every 12 hours');
+    cron.schedule("0 0 0,12 * * *", () => {
+    // cron.schedule("* * * * *", () => {
+      const credentials = obtainCredentials();
+      for (const credential of credentials) {
+        try {
+          logger.info(`updating token for ${credential.name}`);
+          updatePandaToken(credential)
+            .catch((error) => {
+              throw error;
+            });
+        } catch (error) {
+          logger.error(String(error));
+        }
+      }
+    });
+  }
+  
 }
+
+const gracefulShutdown = async (signal: string) => {
+  logger.info(`${signal} received, closing mongoose connection...`);
+  try {
+    await mongoose.connection.close();
+    logger.info('mongoose connection closed');
+    process.exit(0);
+  } catch (error) {
+    logger.error('Error closing mongoose connection: ' + error);
+    process.exit(1);
+  }
+};
 
 main();

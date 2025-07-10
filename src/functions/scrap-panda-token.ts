@@ -5,8 +5,41 @@ import { chromium } from "playwright";
 export async function scrapPandaToken({ email, password }: Pick<Credentials, 'email' | 'password'>, isHeadless: boolean = false): Promise<string | null> {
   logger.debug('start scrapping panda token with playwright. Headless mode: ' + isHeadless);
 
-  const browser = await chromium.launch({ headless: isHeadless });
-  const context = await browser.newContext();
+  const browser = await chromium.launch({ 
+    headless: isHeadless,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--disable-gpu',
+      '--disable-extensions',
+      '--disable-plugins',
+      '--disable-images',
+      '--disable-javascript-harmony-shipping',
+      '--disable-background-timer-throttling',
+      '--disable-backgrounding-occluded-windows',
+      '--disable-renderer-backgrounding',
+      '--disable-features=TranslateUI,VizDisplayCompositor'
+    ]
+  });
+  
+  const context = await browser.newContext({
+    // Disable images and CSS for faster loading
+    ignoreHTTPSErrors: true,
+    // Reduce viewport size for faster rendering
+    viewport: { width: 1280, height: 720 }
+  });
+
+  // Block unnecessary resources
+  await context.route('**/*', (route) => {
+    const resourceType = route.request().resourceType();
+    if (['image', 'font', 'media'].includes(resourceType)) {
+      route.abort();
+    } else {
+      route.continue();
+    }
+  });
   const page = await context.newPage();
 
   /* 
@@ -19,6 +52,7 @@ export async function scrapPandaToken({ email, password }: Pick<Credentials, 'em
   await page.waitForURL('**/login.html**', { timeout: 10000 });
   // wait for network to be idle (no requests for 500ms)
   await page.waitForLoadState('networkidle');
+
   logger.debug('at login page, filling credentials...');
 
   // wait for login form elements to be available
