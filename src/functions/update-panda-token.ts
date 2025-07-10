@@ -9,7 +9,7 @@ export async function updatePandaToken({ email, password, name }: Credentials): 
   }
 
   // obtain panda token from credentials
-  const pandaToken = await scrapPandaToken({ email, password }, false);
+  const pandaToken = await scrapPandaToken({ email, password }, true);
   if (!pandaToken) {
     throw new Error('panda token not found');
   }
