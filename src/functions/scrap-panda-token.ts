@@ -2,7 +2,7 @@ import { Credentials } from "@/@types";
 import logger from "@/utils/logger";
 import { chromium } from "playwright";
 
-export async function scrapPandaToken({ email, password }: Credentials, isHeadless: boolean = false): Promise<string | null> {
+export async function scrapPandaToken({ email, password }: Pick<Credentials, 'email' | 'password'>, isHeadless: boolean = false): Promise<string | null> {
   logger.debug('start scrapping panda token with playwright. Headless mode: ' + isHeadless);
 
   const browser = await chromium.launch({ headless: isHeadless });

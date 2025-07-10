@@ -5,17 +5,18 @@ export enum ENUMDatabaseType {
 
 export type DatabaseType = keyof typeof ENUMDatabaseType;
 
-export enum ENUMUpdateForType {
+export enum ENUMUpdateForName {
   'LinkIO',
   'KIS',
 }
 
-export type UpdateForType = keyof typeof ENUMUpdateForType;
+export type UpdateForName = keyof typeof ENUMUpdateForName;
 
 // freqty credentials
 export type Credentials = {
   email: string;
   password: string;
+  name: UpdateForName;
 };
 
 // freqty token type
