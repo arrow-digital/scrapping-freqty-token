@@ -15,8 +15,8 @@
     "dotenv": "^16.4.5",
     "mongoose": "^8.7.3",
     "node-cron": "^3.0.3",
-    "puppeteer": "^23.6.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "playwright": "^1.54.0"
   },
   "devDependencies": {
     "@types/node": "22.8.1",

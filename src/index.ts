@@ -13,7 +13,7 @@ async function main() {
 
     const { EMAIL_AUTH_PANDA, PASSWORD_AUTH_PANDA } = process.env;
     if (!EMAIL_AUTH_PANDA || !PASSWORD_AUTH_PANDA) {
-      throw new Error("environment variables must be declare");
+      throw new Error("environment variables must be declared");
     }
 
     // Every 1 minutes runs cron job
@@ -22,9 +22,9 @@ async function main() {
     // );
 
     // Every 12 AM and 12 PM runs cron job
-    cron.schedule("0 0 0,12 * * *", () =>
-      updatePandaToken({ email: EMAIL_AUTH_PANDA, password: PASSWORD_AUTH_PANDA }),
-    );
+    // cron.schedule("0 0 0,12 * * *", () =>
+      updatePandaToken({ email: EMAIL_AUTH_PANDA, password: PASSWORD_AUTH_PANDA });
+    // );
   } catch (error) {
     console.log(`[${new Date().toLocaleString()}] Error: ${JSON.stringify(error)}\n`);
   }

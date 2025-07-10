@@ -10,13 +10,13 @@ export async function updatePandaToken({ email, password }: Credentials) {
     throw new Error("panda token not found");
   }
 
-  const tokenFound = await FreqtyToken.findById("6706b4fa394b9035255370a8");
-  if (!tokenFound) {
-    throw new Error("token not found");
-  }
+  // const tokenFound = await FreqtyToken.findById("6706b4fa394b9035255370a8");
+  // if (!tokenFound) {
+  //   throw new Error("token not found");
+  // }
 
-  tokenFound.token = pandaToken;
-  await tokenFound.save();
+  // tokenFound.token = pandaToken;
+  // await tokenFound.save();
 
   console.log(`[${new Date().toLocaleString()}] Finish scrapping\n`);
 }

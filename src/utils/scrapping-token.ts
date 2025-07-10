@@ -1,52 +1,46 @@
-import puppeteer from "puppeteer";
-
 import { Credentials } from "@/@types";
+import { chromium } from "playwright";
 
 export async function scrappingPandaToken({ email, password }: Credentials) {
-  try {
-    const browser = await puppeteer.launch({
-      headless: true,
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--disable-gpu",
-        "--disable-software-rasterizer",
-      ],
-      protocolTimeout: 600000, // Timeout de 10 minutes
-    });
+  const browser = await chromium.launch({ headless: false });
+  const context = await browser.newContext();
+  const page = await context.newPage();
 
-    const page = await browser.newPage();
+  /* 
+   * Login stage
+   */
+  // navigate to login page
+  await page.goto('https://en.freqtek.com/');
 
-    await page.goto("https://en.freqtek.com/", { waitUntil: "networkidle0" });
-    await page.waitForSelector("#verifyEn");
-    await page.waitForSelector("#one");
-    await page.waitForSelector("#login");
+  // wait for the login page to load
+  await page.waitForURL('**/login.html**', { timeout: 10000 });
+  // wait for network to be idle (no requests for 500ms)
+  await page.waitForLoadState('networkidle');
 
-    const emailInput = await page.$('[name="Username"]');
-    const passwordInput = await page.$('[name="Password"]');
+  // wait for login form elements to be available
+  await page.waitForSelector('#username');
+  await page.waitForSelector('#password');
+  await page.waitForSelector('.login');
 
-    if (!emailInput || !passwordInput) {
-      throw new Error("Email or Password input not found");
-    }
+  // fill in the credentials
+  await page.fill('#username', email);
+  await page.fill('#password', password);
 
-    await emailInput.type(email, { delay: 10 });
-    await passwordInput.type(password, { delay: 10 });
+  // click the login button twice
+  await page.click('.login');
+  await page.click('.login');
 
-    await page.evaluate(() => {
-      const loginButton = document.querySelector("#login") as HTMLButtonElement;
-      loginButton.click();
-    });
+  /* 
+   * Token extraction stage
+   */
+  // wait for the page to navigate to /home after login
+  await page.waitForURL('**/home**', { timeout: 10000 });
 
-    await page.waitForNavigation();
-    await page.waitForSelector("#app");
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+  const token = await page.evaluate(() => {
+    return sessionStorage.getItem('token') || null;
+  });
 
-    const token = await page.evaluate(() => sessionStorage.getItem("token"));
-    await browser.close();
+  await browser.close();
 
-    return token;
-  } catch (error) {
-    console.log(`[${new Date().toLocaleString()}] Scrapping error: ${JSON.stringify(error)}\n`);
-  }
+  return token;
 }
