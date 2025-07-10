@@ -7,6 +7,10 @@ const freqtyTokenSchema = new mongoose.Schema<FreqtyTokenType>({
     type: String,
     required: true,
   },
+  name: {
+    type: String,
+    required: true,
+  }
 });
 
 export const FreqtyToken = mongoose.model("FreqtyToken", freqtyTokenSchema);

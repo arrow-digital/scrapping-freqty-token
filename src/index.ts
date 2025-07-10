@@ -24,7 +24,7 @@ async function main() {
 
     // Every 12 AM and 12 PM runs cron job
     // cron.schedule("0 0 0,12 * * *", () =>
-      updatePandaToken({ email: EMAIL_AUTH_PANDA, password: PASSWORD_AUTH_PANDA });
+      updatePandaToken({ email: EMAIL_AUTH_PANDA, password: PASSWORD_AUTH_PANDA }, 'KIS', 'test');
     // );
   } catch (error) {
     logger.error(`${JSON.stringify(error)}`);

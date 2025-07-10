@@ -4,9 +4,7 @@ import { createLogger, format, transport, transports } from 'winston';
 import CloudWatchTransport from 'winston-cloudwatch';
 
 /**
- * Configure log formatting based on environment.
- * Production/Staging: JSON format with error stacks
- * Development: Human-readable format with timestamps, colors, and detailed error info
+ * Human-readable format with timestamps, colors, and detailed error info
  */
 const logFormat = (
   format.combine(
