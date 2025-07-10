@@ -80,7 +80,7 @@ class TypedLogger {
     }
 
     this.logger = createLogger({
-      level: 'debug',
+      level: 'info',
       format: logFormat,
       transports: loggerTransports,
     });
