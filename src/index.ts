@@ -3,17 +3,18 @@ import cron from "node-cron";
 
 import { connectMongo } from "./utils/mongo";
 import { updatePandaToken } from "./functions/update-panda-token";
+import logger from "./utils/logger";
 
 async function main() {
   try {
     await connectMongo();
 
-    console.log(`[${new Date().toLocaleString()}] mongo connected`);
-    console.log(`[${new Date().toLocaleString()}] service is running\n`);
+    logger.info('mongo connected');
+    logger.info('service is running');
 
     const { EMAIL_AUTH_PANDA, PASSWORD_AUTH_PANDA } = process.env;
     if (!EMAIL_AUTH_PANDA || !PASSWORD_AUTH_PANDA) {
-      throw new Error("environment variables must be declared");
+      throw new Error('environment variables must be declared');
     }
 
     // Every 1 minutes runs cron job
@@ -26,7 +27,7 @@ async function main() {
       updatePandaToken({ email: EMAIL_AUTH_PANDA, password: PASSWORD_AUTH_PANDA });
     // );
   } catch (error) {
-    console.log(`[${new Date().toLocaleString()}] Error: ${JSON.stringify(error)}\n`);
+    logger.error(`${JSON.stringify(error)}`);
   }
 }
 
