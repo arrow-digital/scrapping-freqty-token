@@ -10,6 +10,11 @@ const freqtyTokenSchema = new mongoose.Schema<FreqtyTokenType>({
   name: {
     type: String,
     required: true,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+    required: false,
   }
 });
 

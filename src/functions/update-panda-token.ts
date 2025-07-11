@@ -22,6 +22,7 @@ export async function updatePandaToken({ email, password, name }: Credentials): 
   }
 
   tokenFound.token = pandaToken;
+  tokenFound.updatedAt = new Date();
   await tokenFound.save();
 
   logger.info(`finish updating token for ${name}`);

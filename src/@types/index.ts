@@ -23,4 +23,5 @@ export type Credentials = {
 export type FreqtyTokenType = {
   token: string;
   name: string;
+  updatedAt?: Date;
 };
