@@ -49,7 +49,7 @@ export async function scrapPandaToken({ email, password }: Pick<Credentials, 'em
   await page.goto('https://en.freqtek.com/');
 
   // wait for the login page to load
-  await page.waitForURL('**/login.html**', { timeout: 10000 });
+  await page.waitForURL('**/login.html**', { timeout: 20000 });
   // wait for network to be idle (no requests for 500ms)
   await page.waitForLoadState('networkidle');
 
@@ -72,7 +72,7 @@ export async function scrapPandaToken({ email, password }: Pick<Credentials, 'em
    * Token extraction stage
    */
   // wait for the page to navigate to /home after login
-  await page.waitForURL('**/home**', { timeout: 10000 });
+  await page.waitForURL('**/home**', { timeout: 20000 });
   logger.debug('logged in, extracting token...');
 
   const token = await page.evaluate(() => {
