@@ -1,86 +1,44 @@
 # Dockerfile
 
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:20-bookworm-slim AS builder
 
 WORKDIR /app
 
-COPY . .
+# Copy package files first for better caching
+COPY package*.json ./
+COPY tsconfig.json ./
+COPY tsup.config.ts ./
 
-# Instala dependências essenciais do Chromium
-RUN apk add --no-cache \
-  chromium \
-  nss \
-  freetype \
-  harfbuzz \
-  ca-certificates \
-  ttf-freefont \
-  libx11 \
-  libxcomposite \
-  libxdamage \
-  libxi \
-  libxtst \
-  libxrandr \
-  libxrender \
-  mesa-gl \
-  udev \
-  dbus
+# Install dependencies including Playwright
+RUN npm ci
 
-# Defina o caminho do Chromium
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+# Copy source code
+COPY src/ ./src/
 
-# Criando usuário para Puppeteer
-RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
-  && mkdir -p /home/pptruser/Downloads /app \
-  && chown -R pptruser:pptruser /home/pptruser \
-  && chown -R pptruser:pptruser /app
-
-USER pptruser
-
-RUN npm install
+# Build the application
 RUN npm run build
 
-# Production stage
-FROM node:20-alpine AS production
+# Runner stage
+FROM node:20-bookworm-slim AS runner
 
 WORKDIR /app
 
-COPY package*.json .
+# Copy package files
+COPY package*.json ./
 
-# Instala dependências essenciais do Chromium
-RUN apk add --no-cache \
-  chromium \
-  nss \
-  freetype \
-  harfbuzz \
-  ca-certificates \
-  ttf-freefont \
-  libx11 \
-  libxcomposite \
-  libxdamage \
-  libxi \
-  libxtst \
-  libxrandr \
-  libxrender \
-  mesa-gl \
-  udev \
-  dbus
+# Install only production dependencies
+RUN npm ci --omit=dev && npm cache clean --force
 
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+# Install Playwright browser
+RUN npx playwright install chromium --with-deps
 
-RUN addgroup -S pptruser && adduser -S -G pptruser pptruser \
-  && mkdir -p /home/pptruser/Downloads /app \
-  && chown -R pptruser:pptruser /home/pptruser \
-  && chown -R pptruser:pptruser /app
-
-USER pptruser
-
-RUN npm install --omit=dev
-
+# Copy built application from builder stage
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/.env .
 
-RUN source .env
+# Create credentials file if it doesn't exist (will be overridden at runtime)
+COPY credentials.json.example ./credentials.json
+
 
 # bootstrap container
 ENTRYPOINT [ "npm", "start" ]
