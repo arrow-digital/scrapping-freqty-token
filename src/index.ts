@@ -51,8 +51,8 @@ async function main() {
   if (!process.argv.includes('--no-cron')) {
     // set cron job to update tokens every 12 hours
     logger.info('setting up cron job to update tokens every 12 hours');
-    // cron.schedule("0 0 0,12 * * *", () => {
-    cron.schedule("* * * * *", () => {
+    cron.schedule("0 0 0,12 * * *", () => {
+    // cron.schedule("* * * * *", () => {
       logger.info('cron job started');
       const credentials = obtainCredentials();
       logger.info('credentials loaded from file: ' + credentials.length);
