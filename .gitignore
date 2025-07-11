@@ -3,6 +3,8 @@ credentials.json
 package-lock.json
 .vscode
 
+.clinic
+
 # Logs
 logs
 *.log

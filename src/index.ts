@@ -33,7 +33,7 @@ async function main() {
   const credentials = obtainCredentials();
   logger.info('credentials loaded from file: ' + credentials.length);
 
-  if (process.argv.includes('--run-now')) {
+  if (process.argv.includes('--run-once')) {
     // run once sequentially to update all tokens
     logger.info('running update tokens now');
     for (const credential of credentials) {
@@ -44,14 +44,18 @@ async function main() {
         logger.error(String(error));
       }
     }
+    logger.info('all tokens updated successfully');
+    await gracefulShutdown('run-once completed');
   }
 
   if (!process.argv.includes('--no-cron')) {
     // set cron job to update tokens every 12 hours
     logger.info('setting up cron job to update tokens every 12 hours');
-    cron.schedule("0 0 0,12 * * *", () => {
-    // cron.schedule("* * * * *", () => {
+    // cron.schedule("0 0 0,12 * * *", () => {
+    cron.schedule("* * * * *", () => {
+      logger.info('cron job started');
       const credentials = obtainCredentials();
+      logger.info('credentials loaded from file: ' + credentials.length);
       for (const credential of credentials) {
         try {
           logger.info(`updating token for ${credential.name}`);
@@ -63,6 +67,7 @@ async function main() {
           logger.error(String(error));
         }
       }
+      logger.info('cron job completed');
     });
   }
   
